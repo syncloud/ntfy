@@ -1,13 +1,17 @@
 #!/bin/bash -xe
 
 DIR=$( cd "$( dirname "$0" )" && pwd )
+. ${DIR}/version.sh
 
-REPO=https://github.com/cyberb/ntfy.git
-BRANCH=auth-user-header-autocreate
 SRC_DIR=${DIR}/../build/ntfy-src
 
 rm -rf ${SRC_DIR}
-git clone --depth 1 --branch ${BRANCH} ${REPO} ${SRC_DIR}
+mkdir -p ${SRC_DIR}
+while ! wget -q -O ${DIR}/../build/ntfy.tar.gz ${REPO}/archive/refs/heads/${BRANCH}.tar.gz; do
+  sleep 1
+  echo "retry"
+done
+tar xf ${DIR}/../build/ntfy.tar.gz -C ${SRC_DIR} --strip-components=1
 
 cd ${SRC_DIR}
 mkdir -p server/docs

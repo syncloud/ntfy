@@ -4,10 +4,12 @@ import * as fs from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const TMP_DIR = '/tmp/syncloud/ntfy-ui'
-const artifactRoot = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
+import { required } from './helpers/env'
+
+const artifactRoot = required('PLAYWRIGHT_ARTIFACT_DIR')
 
 export default async function () {
-  const project = process.env.PLAYWRIGHT_PROJECT ?? 'desktop'
+  const project = required('PLAYWRIGHT_PROJECT')
   const out = path.join(artifactRoot, 'playwright', project)
   fs.mkdirSync(out, { recursive: true })
 

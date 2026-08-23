@@ -2,7 +2,9 @@ import { Page, TestInfo } from '@playwright/test'
 import * as path from 'node:path'
 import * as fs from 'node:fs'
 
-const artifactRoot = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
+import { required } from './env'
+
+const artifactRoot = required('PLAYWRIGHT_ARTIFACT_DIR')
 
 export async function shoot(page: Page, testInfo: TestInfo, name: string) {
   const view = testInfo.project.name

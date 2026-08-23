@@ -2,18 +2,19 @@
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-if [[ -z "$2" ]]; then
-    echo "usage $0 app version"
-    exit 1
-fi
-
 NAME=$1
-VERSION=$2
+VERSION=$(cat ${DIR}/version)
 ARCH=$(dpkg --print-architecture)
 SNAP_DIR=${DIR}/build/snap
 
-apt update
-apt -y install squashfs-tools
+while ! apt update; do
+  sleep 1
+  echo "retry"
+done
+while ! apt -y install squashfs-tools; do
+  sleep 1
+  echo "retry"
+done
 
 cp -r ${DIR}/bin/* ${SNAP_DIR}/bin
 cp -r ${DIR}/config ${SNAP_DIR}

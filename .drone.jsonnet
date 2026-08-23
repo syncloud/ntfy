@@ -5,12 +5,13 @@ local golang = '1.25.14';
 local python = '3.12-slim-bookworm';
 local playwright = 'mcr.microsoft.com/playwright:v1.48.2-jammy';
 local debian = 'bookworm-slim';
-local platform = '26.04.10';
+local platform = '26.08.01';
 local store_publisher = 'stable-346';
+local distro_default = 'bookworm';
 local distros = ['bookworm', 'buster'];
 
-local platform_image(distro, arch) =
-  'syncloud/platform-' + distro + '-' + arch + ':' + platform;
+local platform_image(distro) =
+  'syncloud/platform-' + distro + ':' + platform;
 
 local build(arch, test_ui) = [{
   kind: 'pipeline',
@@ -25,7 +26,7 @@ local build(arch, test_ui) = [{
       name: 'version',
       image: 'debian:' + debian,
       commands: [
-        'echo $DRONE_BUILD_NUMBER > version',
+        './version.sh',
       ],
     },
     {
@@ -38,7 +39,7 @@ local build(arch, test_ui) = [{
   ] + [
     {
       name: 'nginx test ' + distro,
-      image: platform_image(distro, arch),
+      image: platform_image(distro),
       commands: [
         './nginx/test.sh',
       ],
@@ -62,7 +63,7 @@ local build(arch, test_ui) = [{
   ] + [
     {
       name: 'ntfy test ' + distro,
-      image: platform_image(distro, arch),
+      image: platform_image(distro),
       commands: [
         './ntfy/test.sh',
       ],
@@ -80,8 +81,7 @@ local build(arch, test_ui) = [{
       name: 'package',
       image: 'debian:' + debian,
       commands: [
-        'VERSION=$(cat version)',
-        './package.sh ' + name + ' $VERSION ',
+        './package.sh ' + name,
       ],
     },
   ] + [
@@ -89,9 +89,7 @@ local build(arch, test_ui) = [{
       name: 'test ' + distro,
       image: 'python:' + python,
       commands: [
-        'cd test',
-        './deps.sh',
-        'py.test -x -s test.py --distro=' + distro + ' --ver=$DRONE_BUILD_NUMBER --app=' + name,
+        './test/run.sh ' + distro + ' ' + name,
       ],
     }
     for distro in distros
@@ -100,7 +98,7 @@ local build(arch, test_ui) = [{
            name: 'e2e',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e',
+             './test/e2e/run.sh e2e ' + distro_default + '.com user Password1 root Password1',
            ],
          },
        ] else []) + [
@@ -140,7 +138,7 @@ local build(arch, test_ui) = [{
   services: [
     {
       name: name + '.' + distro + '.com',
-      image: platform_image(distro, arch),
+      image: platform_image(distro),
       privileged: true,
       volumes: [
         { name: 'dbus', path: '/var/run/dbus' },

@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
+import { required } from './helpers/env'
 
-const fullDomain = process.env.PLAYWRIGHT_FULL_DOMAIN ?? 'bookworm.com'
-const appDomain = process.env.PLAYWRIGHT_APP_DOMAIN ?? `ntfy.${fullDomain}`
-const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
+const appDomain = required('PLAYWRIGHT_APP_DOMAIN')
+const artifactDir = required('PLAYWRIGHT_ARTIFACT_DIR')
 
 export default defineConfig({
   testDir: './specs',
@@ -33,9 +33,4 @@ export default defineConfig({
       use: { ...devices['Pixel 7'] },
     },
   ],
-  metadata: {
-    appDomain,
-    fullDomain,
-    artifactDir,
-  },
 })
