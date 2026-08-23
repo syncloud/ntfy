@@ -51,5 +51,7 @@ than in the snap.
 
 - Web Push (browser notifications while the tab is closed) needs a VAPID keypair generated at install
   time via `ntfy webpush keys` and persisted in `$SNAP_DATA`.
-- The app has no UI of its own; the ntfy web app is served directly.
+- The app has no UI of its own; the ntfy web app is served directly. Its account page is not
+  reachable, because that nav entry renders only when ntfy holds its own session token and here
+  Authelia owns identity.
 - Playwright e2e specs.

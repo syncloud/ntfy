@@ -51,10 +51,3 @@ test('settings', async ({ page }, testInfo) => {
   await expect(page).toHaveURL(/settings/)
   await shoot(page, testInfo, '05-settings')
 })
-
-test('account', async ({ page }, testInfo) => {
-  await open(page)
-  await nav(page, 'nav-account').click()
-  await expect(page).toHaveURL(/account/)
-  await shoot(page, testInfo, '06-account')
-})
