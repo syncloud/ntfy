@@ -1,0 +1,43 @@
+import { defineConfig, devices } from '@playwright/test'
+
+const fullDomain = process.env.PLAYWRIGHT_FULL_DOMAIN ?? 'bookworm.com'
+const appDomain = process.env.PLAYWRIGHT_APP_DOMAIN ?? `ntfy.${fullDomain}`
+const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
+const username = process.env.PLAYWRIGHT_DEVICE_USER ?? 'user'
+const password = process.env.PLAYWRIGHT_DEVICE_PASSWORD ?? 'Password1'
+
+export default defineConfig({
+  testDir: './specs',
+  fullyParallel: false,
+  workers: 1,
+  retries: 0,
+  maxFailures: 1,
+  reporter: [['list']],
+  outputDir: `${artifactDir}/playwright/test-results`,
+  globalTeardown: './globalTeardown.ts',
+  timeout: 120_000,
+  expect: { timeout: 30_000 },
+  use: {
+    baseURL: `https://${appDomain}`,
+    ignoreHTTPSErrors: true,
+    httpCredentials: { username, password },
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'on',
+  },
+  projects: [
+    {
+      name: 'desktop',
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 960 } },
+    },
+    {
+      name: 'mobile',
+      use: { ...devices['Pixel 7'] },
+    },
+  ],
+  metadata: {
+    appDomain,
+    fullDomain,
+    artifactDir,
+  },
+})

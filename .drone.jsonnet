@@ -3,6 +3,7 @@ local nginx = '1.24.0';
 local node = '22-bookworm';
 local golang = '1.25.14';
 local python = '3.12-slim-bookworm';
+local playwright = 'mcr.microsoft.com/playwright:v1.48.2-jammy';
 local debian = 'bookworm-slim';
 local platform = '26.04.10';
 local store_publisher = 'stable-346';
@@ -11,7 +12,7 @@ local distros = ['bookworm', 'buster'];
 local platform_image(distro, arch) =
   'syncloud/platform-' + distro + '-' + arch + ':' + platform;
 
-local build(arch) = [{
+local build(arch, test_ui) = [{
   kind: 'pipeline',
   type: 'docker',
   name: arch,
@@ -94,7 +95,15 @@ local build(arch) = [{
       ],
     }
     for distro in distros
-  ] + [
+  ] + (if test_ui then [
+         {
+           name: 'e2e',
+           image: playwright,
+           commands: [
+             './test/e2e/run.sh e2e specs/01-pages.spec.ts',
+           ],
+         },
+       ] else []) + [
     {
       name: 'publish',
       image: 'syncloud/store-publisher:' + store_publisher,
@@ -146,6 +155,6 @@ local build(arch) = [{
   ],
 }];
 
-build('amd64') +
-build('arm64') +
-build('arm')
+build('amd64', true) +
+build('arm64', false) +
+build('arm', false)
