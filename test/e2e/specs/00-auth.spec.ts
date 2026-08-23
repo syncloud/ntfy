@@ -1,15 +1,29 @@
-import { test, expect } from '@playwright/test'
-import { shoot } from '../helpers/screenshot'
+import { test, expect, request } from '@playwright/test'
 
-test('unauthenticated browser is challenged for credentials', async ({ browser, baseURL }, testInfo) => {
-  const context = await browser.newContext({ ignoreHTTPSErrors: true })
-  const page = await context.newPage()
+test('unauthenticated request is challenged for credentials', async ({ baseURL }) => {
+  const context = await request.newContext({ baseURL, ignoreHTTPSErrors: true })
   try {
-    const response = await page.goto(baseURL!)
-    expect(response?.status()).toBe(401)
-    expect(await response?.headerValue('www-authenticate')).toMatch(/^Basic /)
-    await shoot(page, testInfo, '00-unauthenticated')
+    const response = await context.get('/', { maxRedirects: 0 })
+    expect(response.status()).toBe(401)
+    expect(response.headers()['www-authenticate']).toMatch(/^Basic /)
   } finally {
-    await context.close()
+    await context.dispose()
+  }
+})
+
+test('credentials are accepted', async ({ baseURL }) => {
+  const context = await request.newContext({
+    baseURL,
+    ignoreHTTPSErrors: true,
+    httpCredentials: {
+      username: process.env.PLAYWRIGHT_DEVICE_USER ?? 'user',
+      password: process.env.PLAYWRIGHT_DEVICE_PASSWORD ?? 'Password1',
+    },
+  })
+  try {
+    const response = await context.get('/')
+    expect(response.status()).toBe(200)
+  } finally {
+    await context.dispose()
   }
 })
