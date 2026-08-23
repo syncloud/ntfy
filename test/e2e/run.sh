@@ -4,7 +4,7 @@ DIR=$(cd "$(dirname "$0")" && pwd)
 cd "$DIR"
 
 ARTIFACT_SUBDIR=$1
-SPEC=$2
+SPEC=${2:-}
 
 export PLAYWRIGHT_FULL_DOMAIN=${PLAYWRIGHT_FULL_DOMAIN:-bookworm.com}
 export PLAYWRIGHT_APP_DOMAIN=ntfy.${PLAYWRIGHT_FULL_DOMAIN}
@@ -26,5 +26,5 @@ done
 npm ci --no-audit --no-fund
 
 for project in desktop mobile; do
-  PLAYWRIGHT_PROJECT=${project} npx playwright test --project=${project} "$SPEC"
+  PLAYWRIGHT_PROJECT=${project} npx playwright test --project=${project} ${SPEC}
 done

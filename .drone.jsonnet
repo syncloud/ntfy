@@ -100,7 +100,7 @@ local build(arch, test_ui) = [{
            name: 'e2e',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e specs/01-pages.spec.ts',
+             './test/e2e/run.sh e2e',
            ],
          },
        ] else []) + [
