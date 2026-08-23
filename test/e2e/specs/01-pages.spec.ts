@@ -10,6 +10,7 @@ const nav = (page: Page, id: string) => page.getByTestId(drawerId(page)).getByTe
 
 async function open(page: Page) {
   await page.goto('/')
+  await expect(page.getByTestId('splash')).toHaveCount(0)
   if (drawerId(page) === 'nav-drawer-mobile') {
     await page.getByTestId('nav-mobile-toggle').click()
   }
