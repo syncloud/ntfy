@@ -1,0 +1,41 @@
+name: ntfy
+summary: Ntfy
+description: Send push notifications to your phone or desktop with a simple HTTP request, and receive UnifiedPush notifications from your other apps.
+grade: stable
+
+apps:
+
+  server:
+    user: ntfy
+    command: bin/service.ntfy.sh
+    daemon: simple
+    restart-condition: always
+    restart-delay: 10s
+    start-timeout: 600s
+    before: [nginx]
+
+  nginx:
+    user: ntfy
+    command: bin/service.nginx.sh
+    daemon: simple
+    restart-condition: always
+    restart-delay: 10s
+    start-timeout: 600s
+
+  cli:
+    command: bin/cli
+
+  storage-change:
+    command: bin/cli storage-change
+
+  access-change:
+    command: bin/cli access-change
+
+  backup-pre-stop:
+    command: bin/cli backup-pre-stop
+
+  restore-pre-start:
+    command: bin/cli restore-pre-start
+
+  restore-post-start:
+    command: bin/cli restore-post-start
