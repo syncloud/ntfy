@@ -6,6 +6,8 @@ cache-file: "{{ .DataDir }}/cache.db"
 cache-duration: "12h"
 auth-file: "{{ .DataDir }}/user.db"
 auth-default-access: "deny-all"
+auth-access:
+  - "*:up*:write-only"
 
 attachment-cache-dir: "{{ .StorageDir }}/attachments"
 attachment-total-size-limit: "5G"
