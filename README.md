@@ -47,6 +47,13 @@ armv7 while a small one built with identical flags does not; musl produces a wor
 same size. `ntfy/build.sh` smoke-runs the binary so a build that cannot start fails there rather
 than in the snap.
 
+## Screenshots
+
+`test/e2e` drives the ntfy web app with Playwright and writes a PNG and an HTML dump of every page
+in desktop and mobile viewports to `artifact/e2e/playwright/<viewport>/screenshot/` on each amd64
+build. The specs select by `data-testid` only; because the UI is ntfy's own, those ids live in the
+fork.
+
 ## Not yet done
 
 - Web Push (browser notifications while the tab is closed) needs a VAPID keypair generated at install
@@ -54,4 +61,3 @@ than in the snap.
 - The app has no UI of its own; the ntfy web app is served directly. Its account page is not
   reachable, because that nav entry renders only when ntfy holds its own session token and here
   Authelia owns identity.
-- Playwright e2e specs.
