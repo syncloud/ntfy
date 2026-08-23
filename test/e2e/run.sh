@@ -23,6 +23,13 @@ while ! apt-get install -y sshpass openssh-client curl; do
   sleep 1
   echo "retry"
 done
+echo "--- resolving ${PLAYWRIGHT_APP_DOMAIN}"
+getent hosts "${PLAYWRIGHT_APP_DOMAIN}" || true
+echo "--- unauthenticated response"
+curl -sk -D- -o /dev/null --max-time 20 "https://${PLAYWRIGHT_APP_DOMAIN}/" || true
+echo "--- authenticated response"
+curl -sk -D- -o /dev/null --max-time 20 -u "${PLAYWRIGHT_DEVICE_USER}:${PLAYWRIGHT_DEVICE_PASSWORD}" "https://${PLAYWRIGHT_APP_DOMAIN}/" || true
+
 npm ci --no-audit --no-fund
 
 for project in desktop mobile; do
