@@ -1,7 +1,11 @@
 import { test, expect, request } from '@playwright/test'
 
-test('unauthenticated request is challenged for credentials', async ({ baseURL }) => {
-  const context = await request.newContext({ baseURL, ignoreHTTPSErrors: true })
+test('a browser without valid credentials is challenged', async ({ baseURL }) => {
+  const context = await request.newContext({
+    baseURL,
+    ignoreHTTPSErrors: true,
+    httpCredentials: { username: 'nobody', password: 'wrong' },
+  })
   try {
     const response = await context.get('/', { maxRedirects: 0 })
     expect(response.status()).toBe(401)
@@ -11,7 +15,7 @@ test('unauthenticated request is challenged for credentials', async ({ baseURL }
   }
 })
 
-test('credentials are accepted', async ({ baseURL }) => {
+test('device credentials are accepted', async ({ baseURL }) => {
   const context = await request.newContext({
     baseURL,
     ignoreHTTPSErrors: true,
