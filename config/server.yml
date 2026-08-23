@@ -1,4 +1,5 @@
 base-url: "{{ .Url }}"
+listen-http: "-"
 listen-unix: "{{ .DataDir }}/ntfy.sock"
 
 cache-file: "{{ .DataDir }}/cache.db"
