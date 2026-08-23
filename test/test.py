@@ -9,6 +9,7 @@ from syncloudlib.integration.installer import local_install, wait_for_installer
 DIR = dirname(__file__)
 TMP_DIR = '/tmp/syncloud'
 UP_TOPIC = 'upAbCdEf123456'
+UP_TOPIC_SHORT = 'upShort12'
 
 
 @pytest.fixture(scope="session")
@@ -121,6 +122,12 @@ def test_unifiedpush_header_cannot_be_spoofed(app_domain):
                             allow_redirects=False, headers={'Remote-User': 'attacker',
                                                             'Remote-Groups': 'syncloud'})
     assert response.status_code == 401, response.text
+
+
+def test_unifiedpush_publish_any_topic_length(app_domain):
+    response = requests.post('https://{0}/{1}'.format(app_domain, UP_TOPIC_SHORT),
+                             data='unifiedpush', verify=False)
+    assert response.status_code == 200, response.text
 
 
 def test_matrix_gateway_discovery(app_domain):
