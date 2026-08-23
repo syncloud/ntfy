@@ -50,7 +50,7 @@ local build(arch, test_ui) = [{
       name: 'ntfy',
       image: 'golang:' + golang,
       commands: [
-        './ntfy/build.sh',
+        './ntfy/build.sh $DRONE_BUILD_NUMBER',
       ],
     },
   ] + [

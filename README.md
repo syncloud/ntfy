@@ -22,6 +22,9 @@ UnifiedPush endpoints (`/up*`) and the Matrix push gateway are anonymous, becaus
 has no credentials to present. Both strip the `Remote-*` headers, and `auth-default-access` is
 `deny-all`.
 
+The fork also replaces `mattn/go-sqlite3` with `modernc.org/sqlite`, so the binary is pure Go and
+builds with `CGO_ENABLED=0`.
+
 ## Not done
 
 - Web Push (browser notifications with the tab closed).
