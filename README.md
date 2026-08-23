@@ -39,6 +39,14 @@ Both strip `Remote-User` and `Remote-Groups` before proxying, so those headers c
 gain an identity. `auth-default-access` is `deny-all`, so anonymous access to any other topic is
 refused.
 
+## Build
+
+The binary is built from the fork with cgo, since ntfy pins `mattn/go-sqlite3`, and linked
+statically against **musl** rather than glibc. A ~42 MB glibc static binary segfaults on entry on
+armv7 while a small one built with identical flags does not; musl produces a working binary of the
+same size. `ntfy/build.sh` smoke-runs the binary so a build that cannot start fails there rather
+than in the snap.
+
 ## Not yet done
 
 - Web Push (browser notifications while the tab is closed) needs a VAPID keypair generated at install
