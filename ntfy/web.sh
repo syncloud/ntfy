@@ -11,6 +11,11 @@ git clone --depth 1 --branch ${BRANCH} ${REPO} ${SRC_DIR}
 
 cd ${SRC_DIR}
 mkdir -p server/docs
+cat > server/docs/index.html <<'HTML'
+<!doctype html>
+<meta http-equiv="refresh" content="0; url=https://docs.ntfy.sh">
+<a href="https://docs.ntfy.sh">ntfy documentation</a>
+HTML
 
 cd web
 npm ci
