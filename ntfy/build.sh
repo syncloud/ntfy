@@ -2,7 +2,7 @@
 
 DIR=$( cd "$( dirname "$0" )" && pwd )
 . ${DIR}/version.sh
-VERSION=$(cat ${DIR}/../version)
+VERSION=${DRONE_BUILD_NUMBER}
 
 BUILD_DIR=${DIR}/../build/snap
 SRC_DIR=${DIR}/../build/ntfy-src

@@ -2,4 +2,3 @@ build/
 artifact/
 *.snap
 package.name
-version

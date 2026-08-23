@@ -23,13 +23,6 @@ local build(arch, test_ui) = [{
   },
   steps: [
     {
-      name: 'version',
-      image: 'debian:' + debian,
-      commands: [
-        './version.sh',
-      ],
-    },
-    {
       name: 'nginx',
       image: 'nginx:' + nginx,
       commands: [
@@ -81,7 +74,7 @@ local build(arch, test_ui) = [{
       name: 'package',
       image: 'debian:' + debian,
       commands: [
-        './package.sh ' + name,
+        './package.sh ' + name + ' $DRONE_BUILD_NUMBER',
       ],
     },
   ] + [
@@ -89,7 +82,7 @@ local build(arch, test_ui) = [{
       name: 'test ' + distro,
       image: 'python:' + python,
       commands: [
-        './test/run.sh ' + distro + ' ' + name,
+        './test/run.sh ' + distro + ' ' + name + ' $DRONE_BUILD_NUMBER',
       ],
     }
     for distro in distros

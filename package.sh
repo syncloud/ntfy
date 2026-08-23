@@ -3,7 +3,7 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 NAME=$1
-VERSION=$(cat ${DIR}/version)
+VERSION=$2
 ARCH=$(dpkg --print-architecture)
 SNAP_DIR=${DIR}/build/snap
 
@@ -29,6 +29,7 @@ echo "architectures:" >> ${SNAP_DIR}/meta/snap.yaml
 echo "- ${ARCH}" >> ${SNAP_DIR}/meta/snap.yaml
 
 PACKAGE=${NAME}_${VERSION}_${ARCH}.snap
+echo ${VERSION} > ${DIR}/version
 echo ${PACKAGE} > ${DIR}/package.name
 mksquashfs ${SNAP_DIR} ${DIR}/${PACKAGE} -noappend -comp xz -no-xattrs -all-root
 mkdir ${DIR}/artifact
