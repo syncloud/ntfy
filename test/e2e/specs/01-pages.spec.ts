@@ -6,6 +6,17 @@ const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 600
 const drawer = (page: Page) =>
   page.getByTestId(isMobile(page) ? 'nav-drawer-mobile' : 'nav-drawer-desktop')
 
+async function closeDrawer(page: Page) {
+  if (!isMobile(page)) {
+    return
+  }
+  const item = drawer(page).getByTestId('nav-settings')
+  if (await item.isVisible()) {
+    await page.keyboard.press('Escape')
+    await expect(item).toBeHidden()
+  }
+}
+
 async function clickNav(page: Page, id: string) {
   const item = drawer(page).getByTestId(id)
   if (!(await item.isVisible())) {
@@ -28,6 +39,7 @@ test('a user works through the app', async ({ page }, testInfo) => {
   await page.getByTestId('subscribe-submit').click()
   await expect(page.getByTestId('subscribe-dialog')).toBeHidden()
   await expect(page).toHaveURL(/syncloud/)
+  await closeDrawer(page)
   await shoot(page, testInfo, '03-topic')
 
   await clickNav(page, 'nav-publish')
@@ -39,6 +51,7 @@ test('a user works through the app', async ({ page }, testInfo) => {
 
   await clickNav(page, 'nav-settings')
   await expect(page).toHaveURL(/settings/)
+  await closeDrawer(page)
   await shoot(page, testInfo, '05-settings')
 
   await clickNav(page, 'nav-all')
