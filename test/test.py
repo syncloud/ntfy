@@ -54,6 +54,12 @@ def test_index_requires_auth(app_domain):
     assert response.status_code == 401, response.text
 
 
+def test_index_challenges_browser_with_basic_auth(app_domain):
+    response = requests.get('https://{0}'.format(app_domain), verify=False, allow_redirects=False)
+    assert response.status_code == 401, response.text
+    assert response.headers.get('WWW-Authenticate', '').startswith('Basic '), response.headers
+
+
 def test_index_with_device_credentials(app_domain, device_user, device_password):
     response = requests.get('https://{0}'.format(app_domain), verify=False,
                             auth=(device_user, device_password))

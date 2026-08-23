@@ -18,8 +18,24 @@ cat > server/docs/index.html <<'HTML'
 HTML
 
 cd web
-npm ci
-npm run build
+
+build_web() {
+  rm -rf node_modules
+  npm ci --no-audit --no-fund || return 1
+  npm run build
+}
+
+attempt=0
+until build_web; do
+  attempt=$((attempt + 1))
+  if [ ${attempt} -ge 3 ]; then
+    echo "web build failed after ${attempt} attempts"
+    exit 1
+  fi
+  echo "retry web build"
+  sleep 5
+done
+
 mv build/index.html build/app.html
 rm -rf ../server/site
 mv build ../server/site
