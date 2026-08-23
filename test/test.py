@@ -50,13 +50,15 @@ def test_install(app_archive_path, device_host, device_session, device_password,
     wait_for_installer(device_session, domain)
 
 
-def test_index_requires_auth(app_domain):
+def test_index_redirects_browser_to_login(app_domain, domain):
     response = requests.get('https://{0}'.format(app_domain), verify=False, allow_redirects=False)
-    assert response.status_code == 401, response.text
+    assert response.status_code == 302, response.text
+    assert 'auth.{0}'.format(domain) in response.headers.get('Location', ''), response.headers
 
 
-def test_index_challenges_browser_with_basic_auth(app_domain):
-    response = requests.get('https://{0}'.format(app_domain), verify=False, allow_redirects=False)
+def test_index_challenges_client_that_sent_credentials(app_domain):
+    response = requests.get('https://{0}'.format(app_domain), verify=False, allow_redirects=False,
+                            auth=('nobody', 'wrong'))
     assert response.status_code == 401, response.text
     assert response.headers.get('WWW-Authenticate', '').startswith('Basic '), response.headers
 
@@ -89,7 +91,7 @@ def test_publish_and_poll_authenticated(app_domain, device_user, device_password
 
 def test_anonymous_topic_denied(app_domain):
     response = requests.get('https://{0}/mytopic/json?poll=1'.format(app_domain),
-                            verify=False, allow_redirects=False)
+                            verify=False, allow_redirects=False, auth=('nobody', 'wrong'))
     assert response.status_code == 401, response.text
 
 
@@ -101,7 +103,7 @@ def test_unifiedpush_publish_is_anonymous(app_domain):
 
 def test_unifiedpush_topic_cannot_be_read_anonymously(app_domain):
     response = requests.get('https://{0}/{1}/json?poll=1'.format(app_domain, UP_TOPIC),
-                            verify=False, allow_redirects=False)
+                            verify=False, allow_redirects=False, auth=('nobody', 'wrong'))
     assert response.status_code == 401, response.text
 
 
@@ -119,8 +121,8 @@ def test_unifiedpush_header_cannot_be_spoofed(app_domain):
     assert response.status_code == 200, response.text
 
     response = requests.get('https://{0}/v1/account'.format(app_domain), verify=False,
-                            allow_redirects=False, headers={'Remote-User': 'attacker',
-                                                            'Remote-Groups': 'syncloud'})
+                            allow_redirects=False, auth=('nobody', 'wrong'),
+                            headers={'Remote-User': 'attacker', 'Remote-Groups': 'syncloud'})
     assert response.status_code == 401, response.text
 
 

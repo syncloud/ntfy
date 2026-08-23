@@ -3,8 +3,6 @@ import { defineConfig, devices } from '@playwright/test'
 const fullDomain = process.env.PLAYWRIGHT_FULL_DOMAIN ?? 'bookworm.com'
 const appDomain = process.env.PLAYWRIGHT_APP_DOMAIN ?? `ntfy.${fullDomain}`
 const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
-const username = process.env.PLAYWRIGHT_DEVICE_USER ?? 'user'
-const password = process.env.PLAYWRIGHT_DEVICE_PASSWORD ?? 'Password1'
 
 export default defineConfig({
   testDir: './specs',
@@ -20,7 +18,6 @@ export default defineConfig({
   use: {
     baseURL: `https://${appDomain}`,
     ignoreHTTPSErrors: true,
-    httpCredentials: { username, password },
     permissions: ['notifications'],
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

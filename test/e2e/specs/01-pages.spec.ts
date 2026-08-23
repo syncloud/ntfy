@@ -1,6 +1,13 @@
 import { test, expect, Page } from '@playwright/test'
 import { shoot } from '../helpers/screenshot'
 
+test.use({
+  httpCredentials: {
+    username: process.env.PLAYWRIGHT_DEVICE_USER ?? 'user',
+    password: process.env.PLAYWRIGHT_DEVICE_PASSWORD ?? 'Password1',
+  },
+})
+
 const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 600
 
 const drawer = (page: Page) =>

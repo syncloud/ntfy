@@ -20,6 +20,11 @@ via nginx `auth_request`. The `auth-request` authz endpoint accepts both a porta
 `Authorization: Basic` header, so browsers and the Android app authenticate the same way, with
 Syncloud device credentials.
 
+On a 401 the two are told apart by whether the request carried an `Authorization` header. A browser,
+which sends none, is redirected to the Authelia portal using the `Location` Authelia itself returns.
+A client that did send credentials gets a plain 401 with a `WWW-Authenticate` challenge, because the
+ntfy Android app would otherwise follow the redirect and read portal HTML with a 200 as success.
+
 Users are not managed inside ntfy. They are created on their first request from the `Remote-User`
 header, and membership of the `syncloud` group in `Remote-Groups` maps to the ntfy admin role and is
 re-synced on every request. This needs the `auth-user-header` support in
