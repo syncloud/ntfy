@@ -54,6 +54,11 @@ in desktop and mobile viewports to `artifact/e2e/playwright/<viewport>/screensho
 build. The specs select by `data-testid` only; because the UI is ntfy's own, those ids live in the
 fork.
 
+The screenshots carry a "Notifications are blocked" banner. `use.permissions` grants the
+notification permission, but Chrome still reports `Notification.permission === "denied"` against the
+CI device's self-signed certificate, which is the likely cause and is not verified. It does not
+appear on a device with a real certificate.
+
 ## Not yet done
 
 - Web Push (browser notifications while the tab is closed) needs a VAPID keypair generated at install
