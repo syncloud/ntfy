@@ -7,10 +7,11 @@ const drawer = (page: Page) =>
   page.getByTestId(isMobile(page) ? 'nav-drawer-mobile' : 'nav-drawer-desktop')
 
 async function clickNav(page: Page, id: string) {
-  if (isMobile(page)) {
+  const item = drawer(page).getByTestId(id)
+  if (!(await item.isVisible())) {
     await page.getByTestId('nav-mobile-toggle').click()
   }
-  await drawer(page).getByTestId(id).click()
+  await item.click()
 }
 
 test('a user works through the app', async ({ page }, testInfo) => {
