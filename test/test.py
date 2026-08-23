@@ -94,8 +94,15 @@ def test_unifiedpush_publish_is_anonymous(app_domain):
 
 def test_unifiedpush_topic_cannot_be_read_anonymously(app_domain):
     response = requests.get('https://{0}/{1}/json?poll=1'.format(app_domain, UP_TOPIC),
-                            verify=False)
-    assert response.status_code == 403, response.text
+                            verify=False, allow_redirects=False)
+    assert response.status_code == 401, response.text
+
+
+def test_unifiedpush_topic_readable_by_device_user(app_domain, device_user, device_password):
+    response = requests.get('https://{0}/{1}/json?poll=1'.format(app_domain, UP_TOPIC),
+                            verify=False, auth=(device_user, device_password))
+    assert response.status_code == 200, response.text
+    assert 'unifiedpush' in response.text, response.text
 
 
 def test_unifiedpush_header_cannot_be_spoofed(app_domain):

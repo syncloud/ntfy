@@ -18,6 +18,7 @@ behind-proxy: true
 proxy-forwarded-header: "X-Forwarded-For"
 auth-user-header: "Remote-User"
 auth-user-auto-create: true
+auth-user-auto-create-access: "read-write"
 auth-groups-header: "Remote-Groups"
 auth-admin-group: "syncloud"
 
