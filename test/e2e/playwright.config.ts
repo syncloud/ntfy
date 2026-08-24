@@ -13,6 +13,8 @@ const firefox = {
       'dom.push.testing.allowInsecureServerURL': true,
       'dom.push.loglevel': 'debug',
       'dom.webnotifications.enabled': true,
+      'dom.serviceWorkers.testing.enabled': true,
+      'dom.push.connection.enabled': true,
     },
   },
 }

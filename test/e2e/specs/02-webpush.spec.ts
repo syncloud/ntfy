@@ -38,6 +38,17 @@ test('a background notification reaches the push server', async ({ page }, testI
   await expect(drawer(page)).toBeAttached()
   await expect(page.getByTestId('splash')).toHaveCount(0)
 
+  page.on('console', (msg) => console.log(`browser: ${msg.text()}`))
+
+  const context = await page.evaluate(async () => ({
+    secureContext: window.isSecureContext,
+    serviceWorkerApi: 'serviceWorker' in navigator,
+    pushManagerApi: 'PushManager' in window,
+    notificationPermission: typeof Notification === 'undefined' ? 'none' : Notification.permission,
+    registration: !!(await navigator.serviceWorker?.getRegistration()),
+  }))
+  console.log('web push context', JSON.stringify(context))
+
   await clickNav(page, 'nav-settings')
   await expect(page).toHaveURL(/settings/)
   await page.getByTestId('pref-web-push').click()
