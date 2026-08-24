@@ -112,7 +112,7 @@ local build(arch, test_ui) = [{
              PUSH_FAKER_HOST: push_faker_host,
              PUSH_FAKER_PORT: push_faker_port,
              PUSH_FAKER_TLS_PORT: push_faker_tls_port,
-             PUSH_FAKER_CERT_FILE: '/drone/src/push-faker/cert.der',
+             PUSH_FAKER_CERT_FILE: '/drone/src/push-faker/cert.pem',
            },
            commands: [
              './push-faker/faker',

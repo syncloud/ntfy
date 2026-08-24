@@ -54,6 +54,14 @@ curl -sf "http://${PLAYWRIGHT_PUSH_SERVER}/deliveries" > /dev/null || {
 }
 echo "--- push faker at ${PLAYWRIGHT_PUSH_SERVER}"
 
+echo "--- trusting the push faker certificate on the device"
+SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR"
+sshpass -p "${PLAYWRIGHT_SSH_PASSWORD}" scp ${SSH_OPTS} ../../push-faker/cert.pem \
+    "${PLAYWRIGHT_SSH_USER}@${PLAYWRIGHT_DEVICE_HOST}:/usr/local/share/ca-certificates/push-faker.crt"
+sshpass -p "${PLAYWRIGHT_SSH_PASSWORD}" ssh ${SSH_OPTS} \
+    "${PLAYWRIGHT_SSH_USER}@${PLAYWRIGHT_DEVICE_HOST}" \
+    "update-ca-certificates && snap restart ntfy.server"
+
 for project in desktop mobile; do
   PLAYWRIGHT_PROJECT=${project} npx playwright test --project=${project}
 done

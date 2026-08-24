@@ -9,6 +9,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io"
 	"log"
@@ -228,7 +229,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("certificate: %v", err)
 	}
-	if err := os.WriteFile(certFile, der, 0644); err != nil {
+	pemBytes := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: der})
+	if err := os.WriteFile(certFile, pemBytes, 0644); err != nil {
 		log.Fatalf("writing certificate: %v", err)
 	}
 
