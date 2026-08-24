@@ -54,6 +54,14 @@ curl -sf "http://${PLAYWRIGHT_PUSH_SERVER}/deliveries" > /dev/null || {
 }
 echo "--- push faker at ${PLAYWRIGHT_PUSH_SERVER}"
 
+echo "--- allowing the faker as a push endpoint on the device"
+sshpass -p "${PLAYWRIGHT_SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    "${PLAYWRIGHT_SSH_USER}@${PLAYWRIGHT_DEVICE_HOST}" \
+    "grep -q web-push-allowed-endpoints /var/snap/ntfy/current/config/server.yml || \
+     printf 'web-push-allowed-endpoints:\n  - \"http://%s/\"\n' '${PLAYWRIGHT_PUSH_SERVER}' >> /var/snap/ntfy/current/config/server.yml; \
+     snap restart ntfy.server"
+sleep 5
+
 for project in desktop mobile; do
   PLAYWRIGHT_PROJECT=${project} npx playwright test --project=${project}
 done
