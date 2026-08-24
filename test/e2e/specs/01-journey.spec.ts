@@ -69,4 +69,8 @@ test('a user signs in and works through the app', async ({ page }, testInfo) => 
 
   await clickNav(page, 'nav-all')
   await expect(page).not.toHaveURL(/settings/)
+
+  await clickNav(page, 'nav-logout')
+  await expect(page.locator('#username-textfield')).toBeVisible()
+  await shoot(page, testInfo, '07-logged-out')
 })

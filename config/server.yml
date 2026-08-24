@@ -21,6 +21,7 @@ auth-user-auto-create: true
 auth-user-auto-create-access: "read-write"
 auth-groups-header: "Remote-Groups"
 auth-admin-group: "syncloud"
+auth-logout-url: "{{ .LogoutUrl }}"
 
 visitor-request-limit-burst: 200
 visitor-request-limit-replenish: "1s"

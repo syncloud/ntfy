@@ -23,6 +23,7 @@ type Variables struct {
 	DataDir         string
 	StorageDir      string
 	AuthLocalSocket string
+	LogoutUrl       string
 	Url             string
 }
 
@@ -109,6 +110,11 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
+	authUrl, err := i.platformClient.GetAppUrl("auth")
+	if err != nil {
+		return err
+	}
+
 	variables := Variables{
 		App:             App,
 		AppDir:          i.appDir,
@@ -116,6 +122,7 @@ func (i *Installer) UpdateConfigs() error {
 		DataDir:         i.dataDir,
 		StorageDir:      storageDir,
 		AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
+		LogoutUrl:       fmt.Sprintf("%s/logout", authUrl),
 		Url:             appUrl,
 	}
 	if err := config.Generate(path.Join(i.appDir, "config"), i.configDir, variables); err != nil {
