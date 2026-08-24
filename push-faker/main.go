@@ -1,18 +1,49 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
+
+func selfSigned(host string) (tls.Certificate, []byte, error) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return tls.Certificate{}, nil, err
+	}
+	template := x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: host},
+		DNSNames:              []string{host},
+		NotBefore:             time.Now().Add(-time.Hour),
+		NotAfter:              time.Now().Add(24 * time.Hour),
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+	}
+	der, err := x509.CreateCertificate(rand.Reader, &template, &template, &key.PublicKey, key)
+	if err != nil {
+		return tls.Certificate{}, nil, err
+	}
+	return tls.Certificate{Certificate: [][]byte{der}, PrivateKey: key}, der, nil
+}
 
 type message struct {
 	MessageType  string            `json:"messageType"`
@@ -79,7 +110,7 @@ func (f *faker) handleSocket(w http.ResponseWriter, r *http.Request) {
 				MessageType:  "register",
 				ChannelID:    in.ChannelID,
 				Status:       200,
-				PushEndpoint: fmt.Sprintf("http://%s/push/%s", f.host, in.ChannelID),
+				PushEndpoint: fmt.Sprintf("https://%s/push/%s", f.host, in.ChannelID),
 			}
 		case "unregister":
 			f.mutex.Lock()
@@ -171,8 +202,16 @@ func main() {
 	if port == "" {
 		log.Fatal("PUSH_FAKER_PORT is not set")
 	}
+	tlsPort := os.Getenv("PUSH_FAKER_TLS_PORT")
+	if tlsPort == "" {
+		log.Fatal("PUSH_FAKER_TLS_PORT is not set")
+	}
+	certFile := os.Getenv("PUSH_FAKER_CERT_FILE")
+	if certFile == "" {
+		log.Fatal("PUSH_FAKER_CERT_FILE is not set")
+	}
 
-	f := &faker{host: fmt.Sprintf("%s:%s", host, port), channels: make(map[string]*websocket.Conn)}
+	f := &faker{host: fmt.Sprintf("%s:%s", host, tlsPort), channels: make(map[string]*websocket.Conn)}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/push/", f.handlePush)
@@ -185,6 +224,24 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	log.Printf("push faker on %s", f.host)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	certificate, der, err := selfSigned(host)
+	if err != nil {
+		log.Fatalf("certificate: %v", err)
+	}
+	if err := os.WriteFile(certFile, der, 0644); err != nil {
+		log.Fatalf("writing certificate: %v", err)
+	}
+
+	go func() {
+		log.Printf("push faker socket on %s:%s", host, port)
+		log.Fatal(http.ListenAndServe(":"+port, mux))
+	}()
+
+	log.Printf("push faker endpoint on https://%s", f.host)
+	server := &http.Server{
+		Addr:      ":" + tlsPort,
+		Handler:   mux,
+		TLSConfig: &tls.Config{Certificates: []tls.Certificate{certificate}},
+	}
+	log.Fatal(server.ListenAndServeTLS("", ""))
 }

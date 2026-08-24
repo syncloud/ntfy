@@ -8,7 +8,9 @@ local debian = 'bookworm-slim';
 local platform = '26.08.01';
 local store_publisher = 'stable-346';
 local distro_default = 'bookworm';
+local push_faker_host = 'push.mozaws.net';
 local push_faker_port = '8090';
+local push_faker_tls_port = '8443';
 local distros = ['bookworm', 'buster'];
 
 local platform_image(distro) =
@@ -103,12 +105,14 @@ local build(arch, test_ui) = [{
     for distro in distros
   ] + (if test_ui then [
          {
-           name: 'push.' + distro_default + '.com',
+           name: push_faker_host,
            image: 'debian:' + debian,
            detach: true,
            environment: {
-             PUSH_FAKER_HOST: 'push.' + distro_default + '.com',
+             PUSH_FAKER_HOST: push_faker_host,
              PUSH_FAKER_PORT: push_faker_port,
+             PUSH_FAKER_TLS_PORT: push_faker_tls_port,
+             PUSH_FAKER_CERT_FILE: '/drone/src/push-faker/cert.der',
            },
            commands: [
              './push-faker/faker',
@@ -118,7 +122,7 @@ local build(arch, test_ui) = [{
            name: 'e2e',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e ' + distro_default + '.com user Password1 root Password1 push.' + distro_default + '.com:' + push_faker_port,
+             './test/e2e/run.sh e2e ' + distro_default + '.com user Password1 root Password1 ' + push_faker_host + ':' + push_faker_port,
            ],
          },
        ] else []) + [
