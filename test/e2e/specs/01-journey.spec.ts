@@ -39,8 +39,9 @@ test('a user signs in and works through the app', async ({ page }, testInfo) => 
   await page.locator('#password-textfield').fill(devicePassword)
   await page.locator('#sign-in-button').click()
 
-  await expect(page.getByTestId('splash')).toHaveCount(0)
+  await expect(page).toHaveURL(new RegExp(`^https://${required('PLAYWRIGHT_APP_DOMAIN')}`))
   await expect(drawer(page)).toBeAttached()
+  await expect(page.getByTestId('splash')).toHaveCount(0)
   await shoot(page, testInfo, '02-all-notifications')
 
   await clickNav(page, 'nav-subscribe')
