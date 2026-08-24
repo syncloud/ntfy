@@ -32,6 +32,7 @@ type delivery struct {
 	Encoding  string `json:"encoding"`
 	Vapid     bool   `json:"vapid"`
 	TTL       string `json:"ttl"`
+	Status    int    `json:"status"`
 }
 
 type faker struct {
@@ -118,18 +119,25 @@ func (f *faker) handlePush(w http.ResponseWriter, r *http.Request) {
 	if encoding == "" {
 		encoding = "aes128gcm"
 	}
-	log.Printf("push %s %d bytes", channelID, len(body))
-
 	f.mutex.Lock()
+	conn := f.channels[channelID]
+	// A real push service answers 410 for a subscription the browser has dropped, which is what
+	// tells the application server to forget it. Answering 201 for everything would hide that.
+	status := http.StatusCreated
+	if conn == nil {
+		status = http.StatusGone
+	}
 	f.deliveries = append(f.deliveries, delivery{
 		ChannelID: channelID,
 		Bytes:     len(body),
 		Encoding:  encoding,
 		Vapid:     strings.HasPrefix(strings.ToLower(r.Header.Get("Authorization")), "vapid"),
 		TTL:       r.Header.Get("TTL"),
+		Status:    status,
 	})
-	conn := f.channels[channelID]
 	f.mutex.Unlock()
+
+	log.Printf("push %s %d bytes -> %d", channelID, len(body), status)
 
 	if conn != nil {
 		if err := conn.WriteJSON(message{
@@ -142,7 +150,7 @@ func (f *faker) handlePush(w http.ResponseWriter, r *http.Request) {
 			log.Printf("notify: %v", err)
 		}
 	}
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(status)
 }
 
 func (f *faker) handleDeliveries(w http.ResponseWriter, _ *http.Request) {

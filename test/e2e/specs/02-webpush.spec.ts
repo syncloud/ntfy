@@ -61,6 +61,7 @@ test('a background notification reaches the push server', async ({ page }, testI
     const after = await deliveries(page)
     expect(after.length).toBeGreaterThan(before.length)
     const delivery = after[after.length - 1]
+    expect(delivery.status).toBe(201)
     expect(delivery.vapid).toBe(true)
     expect(delivery.bytes).toBeGreaterThan(0)
   }).toPass({ timeout: 60_000 })
