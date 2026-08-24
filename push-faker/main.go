@@ -121,8 +121,6 @@ func (f *faker) handlePush(w http.ResponseWriter, r *http.Request) {
 	}
 	f.mutex.Lock()
 	conn := f.channels[channelID]
-	// A real push service answers 410 for a subscription the browser has dropped, which is what
-	// tells the application server to forget it. Answering 201 for everything would hide that.
 	status := http.StatusCreated
 	if conn == nil {
 		status = http.StatusGone

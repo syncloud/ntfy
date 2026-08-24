@@ -8,8 +8,6 @@ import (
 	"regexp"
 )
 
-// Regenerating the keypair invalidates every browser subscription, so it is generated once and
-// kept in SNAP_DATA, which survives a refresh.
 var webPushKeyRegexp = regexp.MustCompile(`(?m)^web-push-(public|private)-key:\s*(\S+)\s*$`)
 
 type WebPushKeys struct {
