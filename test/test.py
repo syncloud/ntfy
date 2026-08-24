@@ -34,10 +34,18 @@ def module_setup(request, device, data_dir, platform_data_dir, app_dir, artifact
     request.addfinalizer(module_teardown)
 
 
+def settle(device):
+    device.run_ssh('snap wait system seed.loaded', retries=100, throw=False)
+    device.run_ssh('snap set system refresh.hold=2099-01-01T00:00:00Z', retries=20, throw=False)
+    device.run_ssh('snap abort --last=auto-refresh', throw=False)
+    device.run_ssh('snap watch --last=auto-refresh', throw=False)
+
+
 def test_start(module_setup, device, app, domain, device_host):
     add_host_alias(app, device_host, domain)
     device.run_ssh('date', retries=100, throw=True)
     device.run_ssh('mkdir {0}'.format(TMP_DIR))
+    settle(device)
 
 
 def test_activate_device(device):
