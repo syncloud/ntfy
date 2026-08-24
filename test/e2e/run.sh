@@ -20,10 +20,17 @@ while ! apt-get update; do
   sleep 1
   echo "retry"
 done
-while ! apt-get install -y sshpass openssh-client; do
+while ! apt-get install -y sshpass openssh-client curl; do
   sleep 1
   echo "retry"
 done
+
+echo "--- resolving ${PLAYWRIGHT_APP_DOMAIN}"
+getent hosts "${PLAYWRIGHT_APP_DOMAIN}" || true
+cat /etc/resolv.conf || true
+echo "--- unauthenticated response"
+curl -sk -D- -o /dev/null --max-time 20 "https://${PLAYWRIGHT_APP_DOMAIN}/" || true
+
 npm ci --no-audit --no-fund
 
 for project in desktop mobile; do
