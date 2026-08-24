@@ -1,33 +1,10 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 import { shoot } from '../helpers/screenshot'
 import { required } from '../helpers/env'
+import { clickNav, closeDrawer, drawer } from '../helpers/nav'
 
 const deviceUser = required('PLAYWRIGHT_DEVICE_USER')
 const devicePassword = required('PLAYWRIGHT_DEVICE_PASSWORD')
-
-const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 600
-
-const drawer = (page: Page) =>
-  page.getByTestId(isMobile(page) ? 'nav-drawer-mobile' : 'nav-drawer-desktop')
-
-async function clickNav(page: Page, id: string) {
-  const item = drawer(page).getByTestId(id)
-  if (!(await item.isVisible())) {
-    await page.getByTestId('nav-mobile-toggle').click()
-  }
-  await item.click()
-}
-
-async function closeDrawer(page: Page) {
-  if (!isMobile(page)) {
-    return
-  }
-  const item = drawer(page).getByTestId('nav-settings')
-  if (await item.isVisible()) {
-    await page.keyboard.press('Escape')
-    await expect(item).toBeHidden()
-  }
-}
 
 test('a user signs in and works through the app', async ({ page }, testInfo) => {
   await page.goto('/')

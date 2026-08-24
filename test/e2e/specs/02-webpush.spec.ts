@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test'
 import { shoot } from '../helpers/screenshot'
 import { required } from '../helpers/env'
+import { clickNav, closeDrawer, drawer } from '../helpers/nav'
 
 const deviceUser = required('PLAYWRIGHT_DEVICE_USER')
 const devicePassword = required('PLAYWRIGHT_DEVICE_PASSWORD')
@@ -8,19 +9,6 @@ const pushServer = required('PLAYWRIGHT_PUSH_SERVER')
 const appDomain = required('PLAYWRIGHT_APP_DOMAIN')
 
 const topic = 'webpush'
-
-const isMobile = (page: Page) => (page.viewportSize()?.width ?? 0) < 600
-
-const drawer = (page: Page) =>
-  page.getByTestId(isMobile(page) ? 'nav-drawer-mobile' : 'nav-drawer-desktop')
-
-async function clickNav(page: Page, id: string) {
-  const item = drawer(page).getByTestId(id)
-  if (!(await item.isVisible())) {
-    await page.getByTestId('nav-mobile-toggle').click()
-  }
-  await item.click()
-}
 
 async function deliveries(page: Page) {
   const response = await page.request.get(`http://${pushServer}/deliveries`)
@@ -51,6 +39,7 @@ test('a background notification reaches the push server', async ({ page }, testI
 
   await clickNav(page, 'nav-settings')
   await expect(page).toHaveURL(/settings/)
+  await closeDrawer(page)
   await page.getByTestId('pref-web-push').click()
   await page.getByTestId('pref-web-push-enabled').click()
   await shoot(page, testInfo, '08-web-push-enabled')
