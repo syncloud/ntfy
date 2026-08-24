@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	App      = "ntfy"
-	UserName = "ntfy"
+	App          = "ntfy"
+	UserName     = "ntfy"
+	WebPushEmail = "support@syncloud.it"
 )
 
 type Variables struct {
@@ -25,6 +26,9 @@ type Variables struct {
 	AuthLocalSocket string
 	LogoutUrl       string
 	Url             string
+	WebPushPublic   string
+	WebPushPrivate  string
+	WebPushEmail    string
 }
 
 type Installer struct {
@@ -115,6 +119,11 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
+	webPush, err := i.webPushKeys()
+	if err != nil {
+		return err
+	}
+
 	variables := Variables{
 		App:             App,
 		AppDir:          i.appDir,
@@ -123,6 +132,9 @@ func (i *Installer) UpdateConfigs() error {
 		StorageDir:      storageDir,
 		AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
 		LogoutUrl:       fmt.Sprintf("%s/logout", authUrl),
+		WebPushPublic:   webPush.Public,
+		WebPushPrivate:  webPush.Private,
+		WebPushEmail:    WebPushEmail,
 		Url:             appUrl,
 	}
 	if err := config.Generate(path.Join(i.appDir, "config"), i.configDir, variables); err != nil {

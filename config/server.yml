@@ -23,6 +23,11 @@ auth-groups-header: "Remote-Groups"
 auth-admin-group: "syncloud"
 auth-logout-url: "{{ .LogoutUrl }}"
 
+web-push-public-key: "{{ .WebPushPublic }}"
+web-push-private-key: "{{ .WebPushPrivate }}"
+web-push-file: "{{ .DataDir }}/webpush.db"
+web-push-email-address: "{{ .WebPushEmail }}"
+
 visitor-request-limit-burst: 200
 visitor-request-limit-replenish: "1s"
 visitor-subscription-limit: 100

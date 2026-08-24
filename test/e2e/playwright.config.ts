@@ -1,8 +1,21 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
 import { required } from './helpers/env'
 
 const appDomain = required('PLAYWRIGHT_APP_DOMAIN')
 const artifactDir = required('PLAYWRIGHT_ARTIFACT_DIR')
+const pushServer = required('PLAYWRIGHT_PUSH_SERVER')
+
+const firefox = {
+  browserName: 'firefox' as const,
+  launchOptions: {
+    firefoxUserPrefs: {
+      'dom.push.serverURL': `ws://${pushServer}/`,
+      'dom.push.testing.allowInsecureServerURL': true,
+      'dom.push.loglevel': 'debug',
+      'dom.webnotifications.enabled': true,
+    },
+  },
+}
 
 export default defineConfig({
   testDir: './specs',
@@ -26,11 +39,11 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 960 } },
+      use: { ...firefox, viewport: { width: 1440, height: 960 } },
     },
     {
       name: 'mobile',
-      use: { ...devices['Pixel 7'] },
+      use: { ...firefox, viewport: { width: 412, height: 915 } },
     },
   ],
 })

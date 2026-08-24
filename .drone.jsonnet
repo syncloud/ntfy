@@ -71,6 +71,13 @@ local build(arch, test_ui) = [{
       ],
     },
     {
+      name: 'cli test',
+      image: 'golang:' + golang,
+      commands: [
+        './cli/test.sh',
+      ],
+    },
+    {
       name: 'package',
       image: 'debian:' + debian,
       commands: [
