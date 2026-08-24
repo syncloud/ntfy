@@ -2,3 +2,4 @@ build/
 artifact/
 *.snap
 package.name
+push-faker/faker

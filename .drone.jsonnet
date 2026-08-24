@@ -8,6 +8,7 @@ local debian = 'bookworm-slim';
 local platform = '26.08.01';
 local store_publisher = 'stable-346';
 local distro_default = 'bookworm';
+local push_faker_port = '8090';
 local distros = ['bookworm', 'buster'];
 
 local platform_image(distro) =
@@ -71,6 +72,13 @@ local build(arch, test_ui) = [{
       ],
     },
     {
+      name: 'push faker',
+      image: 'golang:' + golang,
+      commands: [
+        './push-faker/build.sh',
+      ],
+    },
+    {
       name: 'cli test',
       image: 'golang:' + golang,
       commands: [
@@ -95,10 +103,22 @@ local build(arch, test_ui) = [{
     for distro in distros
   ] + (if test_ui then [
          {
+           name: 'push.' + distro_default + '.com',
+           image: 'debian:' + debian,
+           detach: true,
+           environment: {
+             PUSH_FAKER_HOST: 'push.' + distro_default + '.com',
+             PUSH_FAKER_PORT: push_faker_port,
+           },
+           commands: [
+             './push-faker/faker',
+           ],
+         },
+         {
            name: 'e2e',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e ' + distro_default + '.com user Password1 root Password1',
+             './test/e2e/run.sh e2e ' + distro_default + '.com user Password1 root Password1 push.' + distro_default + '.com:' + push_faker_port,
            ],
          },
        ] else []) + [
