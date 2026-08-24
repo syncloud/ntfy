@@ -27,7 +27,15 @@ done
 
 echo "--- resolving ${PLAYWRIGHT_APP_DOMAIN}"
 getent hosts "${PLAYWRIGHT_APP_DOMAIN}" || true
-cat /etc/resolv.conf || true
+
+DEVICE_IP=$(getent hosts "${PLAYWRIGHT_APP_DOMAIN}" | awk '{print $1}' | head -1)
+if [ -z "${DEVICE_IP}" ]; then
+    echo "cannot resolve ${PLAYWRIGHT_APP_DOMAIN}"
+    exit 1
+fi
+echo "${DEVICE_IP} auth.$2 $2" >> /etc/hosts
+echo "--- hosts"
+tail -2 /etc/hosts
 echo "--- unauthenticated response"
 curl -sk -D- -o /dev/null --max-time 20 "https://${PLAYWRIGHT_APP_DOMAIN}/" || true
 
