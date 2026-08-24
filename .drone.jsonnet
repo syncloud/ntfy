@@ -10,7 +10,7 @@ local store_publisher = 'stable-346';
 local distro_default = 'bookworm';
 local push_faker_host = 'push.mozaws.net';
 local push_faker_port = '8090';
-local push_faker_tls_port = '8443';
+local push_faker_tls_port = '443';
 local distros = ['bookworm', 'buster'];
 
 local platform_image(distro) =

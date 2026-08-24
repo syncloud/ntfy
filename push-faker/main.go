@@ -212,7 +212,11 @@ func main() {
 		log.Fatal("PUSH_FAKER_CERT_FILE is not set")
 	}
 
-	f := &faker{host: fmt.Sprintf("%s:%s", host, tlsPort), channels: make(map[string]*websocket.Conn)}
+	endpointHost := host
+	if tlsPort != "443" {
+		endpointHost = fmt.Sprintf("%s:%s", host, tlsPort)
+	}
+	f := &faker{host: endpointHost, channels: make(map[string]*websocket.Conn)}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/push/", f.handlePush)
