@@ -1,0 +1,39 @@
+base-url: "{{ .Url }}"
+listen-http: "-"
+listen-unix: "{{ .DataDir }}/ntfy.sock"
+
+cache-file: "{{ .DataDir }}/cache.db"
+cache-duration: "12h"
+auth-file: "{{ .DataDir }}/user.db"
+auth-default-access: "deny-all"
+auth-access:
+  - "*:up*:write-only"
+
+attachment-cache-dir: "{{ .StorageDir }}/attachments"
+attachment-total-size-limit: "5G"
+attachment-file-size-limit: "15M"
+attachment-expiry-duration: "3h"
+
+behind-proxy: true
+proxy-forwarded-header: "X-Forwarded-For"
+auth-user-header: "Remote-User"
+auth-user-auto-create: true
+auth-user-auto-create-access: "read-write"
+auth-groups-header: "Remote-Groups"
+auth-admin-group: "syncloud"
+auth-logout-url: "{{ .LogoutUrl }}"
+
+web-push-public-key: "{{ .WebPushPublic }}"
+web-push-private-key: "{{ .WebPushPrivate }}"
+web-push-file: "{{ .DataDir }}/webpush.db"
+web-push-email-address: "{{ .WebPushEmail }}"
+
+visitor-request-limit-burst: 200
+visitor-request-limit-replenish: "1s"
+visitor-subscription-limit: 100
+
+enable-signup: false
+enable-login: false
+
+log-level: "info"
+log-format: "text"

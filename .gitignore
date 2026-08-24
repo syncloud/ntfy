@@ -1,0 +1,6 @@
+build/
+artifact/
+*.snap
+package.name
+push-faker/faker
+push-faker/cert.pem
