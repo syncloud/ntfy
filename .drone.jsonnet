@@ -1,5 +1,5 @@
 local name = 'ntfy';
-local nginx = '1.24.0';
+local nginx = '1.30.7';
 local node = '22-bookworm';
 local golang = '1.25.14';
 local python = '3.12-slim-bookworm';
